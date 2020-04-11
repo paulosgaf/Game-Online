@@ -65,7 +65,6 @@ z_index = -4
 texture = ExtResource( 4 )
 
 [node name="Borda" type="Sprite" parent="."]
-visible = false
 modulate = Color( 0, 0, 0, 1 )
 z_index = 1
 texture = ExtResource( 3 )
