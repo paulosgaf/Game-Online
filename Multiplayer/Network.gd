@@ -2,7 +2,7 @@ extends Node
 
 var DEFAULT_IP
 const DEFAULT_PORT = 31400
-const MAX_PLAYERS = 2
+const MAX_PLAYERS = 4
 
 var players = { }
 var self_data = { name = '', position = Vector2(0, -200) }
