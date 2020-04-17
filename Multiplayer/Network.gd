@@ -1,8 +1,8 @@
 extends Node
 
-const DEFAULT_IP = '127.0.0.1'
+var DEFAULT_IP
 const DEFAULT_PORT = 31400
-const MAX_PLAYERS = 5
+const MAX_PLAYERS = 2
 
 var players = { }
 var self_data = { name = '', position = Vector2(0, -200) }
@@ -14,14 +14,16 @@ func _ready():
 	get_tree().connect('network_peer_disconnected', self, '_on_player_disconnected')
 	get_tree().connect('network_peer_connected', self, '_on_player_connected')
 
-func create_server(player_nickname):
+func create_server(player_nickname, player_IP):
+	DEFAULT_IP = player_IP
 	self_data.name = player_nickname
 	players[1] = self_data
 	var peer = NetworkedMultiplayerENet.new()
 	peer.create_server(DEFAULT_PORT, MAX_PLAYERS)
 	get_tree().set_network_peer(peer)
 
-func connect_to_server(player_nickname):
+func connect_to_server(player_nickname, player_IP):
+	DEFAULT_IP = player_IP
 	self_data.name = player_nickname
 	get_tree().connect('connected_to_server', self, '_connected_to_server')
 	var peer = NetworkedMultiplayerENet.new()

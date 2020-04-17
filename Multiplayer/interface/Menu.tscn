@@ -44,14 +44,14 @@ margin_bottom = 124.0
 custom_constants/separation = 20
 
 [node name="Label" type="Label" parent="VBoxContainer/HBoxContainer"]
-margin_right = 255.0
+margin_right = 113.0
 margin_bottom = 52.0
 custom_fonts/font = ExtResource( 2 )
-text = "Your name:"
+text = "Nick:"
 align = 2
 
-[node name="TextField" type="LineEdit" parent="VBoxContainer/HBoxContainer"]
-margin_left = 275.0
+[node name="Nick" type="LineEdit" parent="VBoxContainer/HBoxContainer"]
+margin_left = 133.0
 margin_right = 630.0
 margin_bottom = 52.0
 rect_min_size = Vector2( 0, 24 )
@@ -62,10 +62,32 @@ custom_fonts/font = ExtResource( 3 )
 [node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer"]
 margin_top = 144.0
 margin_right = 630.0
-margin_bottom = 240.0
+margin_bottom = 196.0
+custom_constants/separation = 20
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer2"]
+margin_right = 214.0
+margin_bottom = 52.0
+custom_fonts/font = ExtResource( 2 )
+text = "Server IP:"
+align = 2
+
+[node name="IP" type="LineEdit" parent="VBoxContainer/HBoxContainer2"]
+margin_left = 234.0
+margin_right = 630.0
+margin_bottom = 52.0
+rect_min_size = Vector2( 0, 24 )
+size_flags_horizontal = 3
+size_flags_vertical = 3
+custom_fonts/font = ExtResource( 3 )
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="VBoxContainer"]
+margin_top = 216.0
+margin_right = 630.0
+margin_bottom = 312.0
 custom_constants/separation = 0
 
-[node name="JoinButton" type="TextureButton" parent="VBoxContainer/HBoxContainer2"]
+[node name="JoinButton" type="TextureButton" parent="VBoxContainer/HBoxContainer3"]
 margin_right = 315.0
 margin_bottom = 96.0
 rect_min_size = Vector2( 192, 96 )
@@ -76,7 +98,7 @@ texture_pressed = ExtResource( 5 )
 expand = true
 stretch_mode = 5
 
-[node name="CreateButton" type="TextureButton" parent="VBoxContainer/HBoxContainer2"]
+[node name="CreateButton" type="TextureButton" parent="VBoxContainer/HBoxContainer3"]
 margin_left = 315.0
 margin_right = 630.0
 margin_bottom = 96.0
@@ -87,6 +109,7 @@ texture_normal = ExtResource( 6 )
 texture_pressed = ExtResource( 7 )
 expand = true
 stretch_mode = 5
-[connection signal="text_changed" from="VBoxContainer/HBoxContainer/TextField" to="." method="_on_TextField_text_changed"]
-[connection signal="pressed" from="VBoxContainer/HBoxContainer2/JoinButton" to="." method="_on_JoinButton_pressed"]
-[connection signal="pressed" from="VBoxContainer/HBoxContainer2/CreateButton" to="." method="_on_CreateButton_pressed"]
+[connection signal="text_changed" from="VBoxContainer/HBoxContainer/Nick" to="." method="_on_Nick_text_changed"]
+[connection signal="text_changed" from="VBoxContainer/HBoxContainer2/IP" to="." method="_on_IP_text_changed"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer3/JoinButton" to="." method="_on_JoinButton_pressed"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer3/CreateButton" to="." method="_on_CreateButton_pressed"]
