@@ -57,4 +57,10 @@ func _on_body_entered(body):
 		queue_free()
 	if body is TileMap:
 		queue_free()
+	if body is Area2D:
+		queue_free()
 
+
+func _on_Area2D_area_entered(area):
+	if area is Area2D:
+		queue_free()

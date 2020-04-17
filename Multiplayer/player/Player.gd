@@ -1,7 +1,5 @@
 extends KinematicBody2D
 
-
-
 var UP = Vector2(0, -1)
 var GRAVITY = 30
 var JUMP_HEIGHT = -600
@@ -27,6 +25,10 @@ slave var baixo_s
 slave var jump_s
 slave var dash_s
 slave var tiro_s
+slave var pressed_s
+slave var last_pressed_s
+
+var last_pressed
 
 func _ready():
 	_update_health_bar()
@@ -48,6 +50,19 @@ func _physics_process(delta):
 		var jump = Input.is_action_pressed("jump")
 		var jump_j = Input.is_action_just_pressed("jump")
 		
+		var pressed
+		
+		if direita:
+			last_pressed = 1
+		if esquerda:
+			last_pressed = -1
+		
+
+		if !direita and !esquerda and !cima and !baixo:
+			pressed = false
+		else:
+			pressed = true
+		
 		#-------FUNCOES ATIVADAS-------
 		rset_unreliable('slave_position', position)
 		rset('direita_s', direita)
@@ -57,15 +72,17 @@ func _physics_process(delta):
 		rset('jump_s', jump)
 		rset('dash_s', dash)
 		rset('tiro_s', tiro)
+		rset('pressed_s', pressed)
+		rset('last_pressed_s', last_pressed)
 		
 		_move(direita, esquerda, jump_j, dash, tiro)
-		_rifle_diretion(direita, esquerda, cima, baixo)
+		_rifle_diretion(direita, esquerda, cima, baixo, pressed, last_pressed)
 	
 	else:
 		#-------VISAO DOS OPONENTES-------
-		_move_s(direita_s, esquerda_s, jump_s, dash_s, tiro_s)
 		position = slave_position
-		_rifle_diretion(direita_s, esquerda_s, cima_s, baixo_s)
+		_move_s(direita_s, esquerda_s, jump_s, dash_s, tiro_s)
+		_rifle_diretion(direita_s, esquerda_s, cima_s, baixo_s, pressed_s, last_pressed_s)
 	
 	if get_tree().is_network_server():
 		Network.update_position(int(name), position)
@@ -146,6 +163,10 @@ func _move_s(direita, esquerda, jump, dash, tiro):
 	#----------RUN----------
 	if jump:
 		$Sprite.play("Jump")
+		if direita:
+			$Sprite.flip_h = false
+		elif esquerda:
+			$Sprite.flip_h = true
 	elif direita:
 		$Sprite.play("Run")
 		$Sprite.flip_h = false
@@ -169,21 +190,69 @@ func _move_s(direita, esquerda, jump, dash, tiro):
 func _on_DashTimer_timeout():
 	SPEED = 200
 
-func _rifle_diretion(direita, esquerda, cima, baixo):
+func _rifle_diretion(direita, esquerda, cima, baixo, pressed, last_pressed):
 	
 	#--------DIRECAO DO TIRO--------
-	if direita:
-		$Rifle.direcao = Vector2(1,0)
-		$Rifle.set_position(Vector2(45,0))
-	elif esquerda:
-		$Rifle.direcao = Vector2(-1,0)
-		$Rifle.set_position(Vector2(-45,0))
-	elif cima:
-		$Rifle.direcao = Vector2(0,-1)
-		$Rifle.set_position(Vector2(0,-45))
-	elif baixo:
-		$Rifle.direcao = Vector2(0,1)
-		$Rifle.set_position(Vector2(0,45))
+	
+	if !_on_wall:
+		if direita:
+			$Rifle.direcao = Vector2(1,0)
+			$Rifle.set_position(Vector2(45,0))
+		elif esquerda:
+			$Rifle.direcao = Vector2(-1,0)
+			$Rifle.set_position(Vector2(-45,0))
+		
+		elif cima:
+			$Rifle.direcao = Vector2(0,-1)
+			$Rifle.set_position(Vector2(0,-45))
+		elif baixo:
+			$Rifle.direcao = Vector2(0,1)
+			$Rifle.set_position(Vector2(0,45))
+			
+		if direita and cima:
+			$Rifle.direcao = Vector2(1,-1)
+			$Rifle.set_position(Vector2(45,-45))
+		elif direita and baixo:
+			$Rifle.direcao = Vector2(1,1)
+			$Rifle.set_position(Vector2(45,45))
+		elif esquerda and cima:
+			$Rifle.direcao = Vector2(-1,-1)
+			$Rifle.set_position(Vector2(-45,-45))
+		elif esquerda and baixo:
+			$Rifle.direcao = Vector2(-1,1)
+			$Rifle.set_position(Vector2(-45,45))
+	
+	else:
+		if direita:
+			$Rifle.direcao = Vector2(-1,0)
+			$Rifle.set_position(Vector2(-45,0))
+		elif esquerda:
+			$Rifle.direcao = Vector2(1,0)
+			$Rifle.set_position(Vector2(45,0))
+		
+		if direita and cima:
+			$Rifle.direcao = Vector2(-1,-1)
+			$Rifle.set_position(Vector2(-45,-45))
+		elif direita and baixo:
+			$Rifle.direcao = Vector2(-1,1)
+			$Rifle.set_position(Vector2(-45,45))
+		elif esquerda and cima:
+			$Rifle.direcao = Vector2(1,-1)
+			$Rifle.set_position(Vector2(45,-45))
+		elif esquerda and baixo:
+			$Rifle.direcao = Vector2(1,1)
+			$Rifle.set_position(Vector2(45,45))
+	
+	
+			
+	if !pressed:
+		if last_pressed == 1:
+			$Rifle.direcao = Vector2(1,0)
+			$Rifle.set_position(Vector2(45,0))
+		elif last_pressed == -1:
+			$Rifle.direcao = Vector2(-1,0)
+			$Rifle.set_position(Vector2(-45,0))
+
 	
 func _update_health_bar():
 	$GUI/HealthBar.value = health_points
