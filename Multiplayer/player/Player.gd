@@ -16,6 +16,9 @@ const MAX_HP = 3
 var health_points = MAX_HP
 
 
+var last_pressed
+
+
 #-----VARIAVEIS DE VIZUALIZAÇÃO
 slave var slave_position = Vector2()
 slave var direita_s
@@ -27,11 +30,12 @@ slave var dash_s
 slave var tiro_s
 slave var pressed_s
 slave var last_pressed_s
+slave var health_points_s
 
-var last_pressed
+
 
 func _ready():
-	_update_health_bar()
+	_update_health_bar(health_points)
 
 func _physics_process(delta):
 	
@@ -74,15 +78,19 @@ func _physics_process(delta):
 		rset('tiro_s', tiro)
 		rset('pressed_s', pressed)
 		rset('last_pressed_s', last_pressed)
+		rset('health_points_s', health_points)
+		
 		
 		_move(direita, esquerda, jump_j, dash, tiro)
 		_rifle_diretion(direita, esquerda, cima, baixo, pressed, last_pressed)
+		_update_health_bar(health_points)
 	
 	else:
 		#-------VISAO DOS OPONENTES-------
 		position = slave_position
 		_move_s(direita_s, esquerda_s, jump_s, dash_s, tiro_s)
 		_rifle_diretion(direita_s, esquerda_s, cima_s, baixo_s, pressed_s, last_pressed_s)
+		_update_health_bar(health_points_s)
 	
 	if get_tree().is_network_server():
 		Network.update_position(int(name), position)
@@ -180,7 +188,7 @@ func _move_s(direita, esquerda, jump, dash, tiro):
 	if tiro:
 		$Sprite.play("Atack")
 	
-	if _on_wall:
+	if _on_wall and !jump:
 		$Sprite.play("Wall")
 	
 	if in_dash:
@@ -254,7 +262,7 @@ func _rifle_diretion(direita, esquerda, cima, baixo, pressed, last_pressed):
 			$Rifle.set_position(Vector2(-45,0))
 
 	
-func _update_health_bar():
+func _update_health_bar(health_points):
 	$GUI/HealthBar.value = health_points
 
 func damage(value):
@@ -262,7 +270,7 @@ func damage(value):
 	if health_points <= 0:
 		health_points = 0
 		rpc('_die')
-	_update_health_bar()
+	_update_health_bar(health_points)
 
 sync func _die():
 	$RespawnTimer.start()
@@ -281,7 +289,7 @@ func _on_RespawnTimer_timeout():
 			child.show()
 	$Shape.disabled = false
 	health_points = MAX_HP
-	_update_health_bar()
+	_update_health_bar(health_points)
 
 func init(nickname, start_position, is_slave):
 	global_position = start_position

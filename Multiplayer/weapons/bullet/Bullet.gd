@@ -52,13 +52,9 @@ func _process(delta):
 	#---------------------TELEPORTE DO MAPA#---------------------
 
 func _on_body_entered(body):
-	if body.is_in_group('players'):
+	if body is KinematicBody2D:
 		body.damage(DAMAGE)
-		queue_free()
-	if body is TileMap:
-		queue_free()
-	if body is Area2D:
-		queue_free()
+	queue_free()
 
 
 func _on_Area2D_area_entered(area):
