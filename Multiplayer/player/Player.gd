@@ -9,14 +9,16 @@ var tempo = tempoDash
 var jump_cont = 0
 var extra_jump = 1
 
-var _on_wall = false
-var in_dash = false
-
 const MAX_HP = 3
 var health_points = MAX_HP
 
-
 var last_pressed
+var _on_wall = false
+var in_dash = false
+
+
+
+
 
 
 #-----VARIAVEIS DE VIZUALIZAÇÃO
@@ -32,7 +34,7 @@ slave var pressed_s
 slave var last_pressed_s
 slave var health_points_s
 
-
+slave var in_dash_s
 
 func _ready():
 	_update_health_bar(health_points)
@@ -61,11 +63,15 @@ func _physics_process(delta):
 		if esquerda:
 			last_pressed = -1
 		
-
 		if !direita and !esquerda and !cima and !baixo:
 			pressed = false
 		else:
 			pressed = true
+			
+		if SPEED == 600:
+			in_dash = true
+		else:
+			in_dash = false
 		
 		#-------FUNCOES ATIVADAS-------
 		rset_unreliable('slave_position', position)
@@ -76,26 +82,27 @@ func _physics_process(delta):
 		rset('jump_s', jump)
 		rset('dash_s', dash)
 		rset('tiro_s', tiro)
+		rset('in_dash_s', in_dash)
 		rset('pressed_s', pressed)
 		rset('last_pressed_s', last_pressed)
 		rset('health_points_s', health_points)
 		
 		
-		_move(direita, esquerda, jump_j, dash, tiro)
+		_move(direita, esquerda, jump_j, dash, tiro, in_dash)
 		_rifle_diretion(direita, esquerda, cima, baixo, pressed, last_pressed)
 		_update_health_bar(health_points)
 	
 	else:
 		#-------VISAO DOS OPONENTES-------
 		position = slave_position
-		_move_s(direita_s, esquerda_s, jump_s, dash_s, tiro_s)
+		_move_s(direita_s, esquerda_s, jump_s, dash_s, tiro_s, in_dash_s)
 		_rifle_diretion(direita_s, esquerda_s, cima_s, baixo_s, pressed_s, last_pressed_s)
 		_update_health_bar(health_points_s)
 	
 	if get_tree().is_network_server():
 		Network.update_position(int(name), position)
 		
-func _move(direita, esquerda, jump, dash, tiro):
+func _move(direita, esquerda, jump, dash, tiro, in_dash):
 	
 	#--------MOVIMENTO DO PLAYER--------
 	
@@ -164,7 +171,7 @@ func _move(direita, esquerda, jump, dash, tiro):
 	slave_position = move_and_slide(slave_position, UP)
 		
 	
-func _move_s(direita, esquerda, jump, dash, tiro):
+func _move_s(direita, esquerda, jump, dash, tiro, in_dash):
 	
 	#--------SPRITES DO PLAYER--------
 	
@@ -195,8 +202,7 @@ func _move_s(direita, esquerda, jump, dash, tiro):
 		$Sprite.play("Dash")
 	
 	
-func _on_DashTimer_timeout():
-	SPEED = 200
+
 
 func _rifle_diretion(direita, esquerda, cima, baixo, pressed, last_pressed):
 	
@@ -261,7 +267,6 @@ func _rifle_diretion(direita, esquerda, cima, baixo, pressed, last_pressed):
 			$Rifle.direcao = Vector2(-1,0)
 			$Rifle.set_position(Vector2(-45,0))
 
-	
 func _update_health_bar(health_points):
 	$GUI/HealthBar.value = health_points
 
@@ -290,6 +295,9 @@ func _on_RespawnTimer_timeout():
 	$Shape.disabled = false
 	health_points = MAX_HP
 	_update_health_bar(health_points)
+
+func _on_DashTimer_timeout():
+	SPEED = 200
 
 func init(nickname, start_position, is_slave):
 	global_position = start_position
