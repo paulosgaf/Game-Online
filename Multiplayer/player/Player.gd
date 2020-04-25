@@ -17,10 +17,6 @@ var _on_wall = false
 var in_dash = false
 
 
-
-
-
-
 #-----VARIAVEIS DE VIZUALIZAÇÃO
 slave var slave_position = Vector2()
 slave var direita_s
